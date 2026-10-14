@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#14181d">
+  <title>SafeRoute — Community Hazard Reporting</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#14181d;--panel:#1d232b;--edge:#2a323c;--text:#edeff2;--muted:#8d97a3;--hazard:#ff7a29;--review:#f5b942;--resolved:#3ecf8e;--danger:#e94d3d}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;min-height:100vh}
+    h1,h2,h3,.navbar-brand{font-family:'Barlow Condensed',sans-serif} .mono{font-family:'JetBrains Mono',monospace}.muted{color:var(--muted)}
+    .navbar-sr{background:rgba(20,24,29,.95);border-bottom:1px solid var(--edge);backdrop-filter:blur(12px)}.navbar-brand{font-weight:700;font-size:1.6rem;color:var(--text)!important}.navbar-brand span{color:var(--hazard)}.nav-link{color:var(--muted)!important}.nav-link:hover{color:var(--hazard)!important}
+    .hero{padding:5rem 0 3rem;border-bottom:1px solid var(--edge);background:radial-gradient(ellipse at 85% 15%,rgba(255,122,41,.08),transparent 45%)}.hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:700;line-height:1.03}.eyebrow,.section-label{font-family:'JetBrains Mono',monospace;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hazard)}.section-label{color:var(--muted)}
+    .btn-hazard{background:var(--hazard);color:#20120a;font-weight:700;border:0;padding:.75rem 1.35rem;border-radius:8px}.btn-hazard:hover{background:#ff914f;color:#20120a}.btn-hazard:disabled{opacity:.65}
+    .pipeline-panel,.form-panel,.report-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:1.5rem}.pipeline-stat .num{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700}.pipeline-stat .lbl{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.pipeline-track{height:12px;border-radius:8px;background:var(--bg);overflow:hidden;display:flex;margin-top:1.2rem;border:1px solid var(--edge)}.seg{height:100%;transition:width .35s ease}
+    section{padding:4rem 0;border-top:1px solid var(--edge)}.section-title{font-size:clamp(1.8rem,3vw,2.4rem);font-weight:600}.form-label{color:var(--muted);font-size:.85rem}.form-control,.form-select{background:var(--bg);border:1px solid var(--edge);color:var(--text)}.form-control::placeholder{color:#68727e}.form-control:focus,.form-select:focus{background:var(--bg);color:var(--text);border-color:var(--hazard);box-shadow:0 0 0 3px rgba(255,122,41,.15)}.form-select option{background:var(--bg);color:var(--text)}.invalid-feedback{color:var(--danger)}
+    .severity-group{display:flex;gap:.6rem}.severity-opt{flex:1;border:1px solid var(--edge);border-radius:8px;padding:.65rem;text-align:center;cursor:pointer;color:var(--muted);transition:.15s}.severity-opt input{position:absolute;opacity:0;pointer-events:none}.severity-opt:focus-within{outline:2px solid var(--hazard)}.active-low{border-color:var(--resolved);color:var(--resolved);background:rgba(62,207,142,.06)}.active-medium{border-color:var(--review);color:var(--review);background:rgba(245,185,66,.06)}.active-high{border-color:var(--danger);color:var(--danger);background:rgba(233,77,61,.06)}
+    #photoPreview{width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:.6rem;display:none}.filter-btn{border:1px solid var(--edge);background:transparent;color:var(--muted);padding:.45rem 1rem;border-radius:20px;font-size:.82rem;margin:0 .4rem .5rem 0}.filter-btn:hover{border-color:var(--hazard);color:var(--text)}.filter-btn.active{background:var(--hazard);border-color:var(--hazard);color:#20120a;font-weight:700}
+    .status-badge{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.7rem;padding:.3rem .55rem;border-radius:6px;text-transform:uppercase}.st-reported{background:rgba(255,122,41,.15);color:var(--hazard)}.st-review{background:rgba(245,185,66,.15);color:var(--review)}.st-resolved{background:rgba(62,207,142,.15);color:var(--resolved)}.card-photo{width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:.8rem}.report-card{height:100%;padding:1.25rem;overflow-wrap:anywhere}.admin-row{display:flex;gap:.5rem;margin-top:1rem;border-top:1px solid var(--edge);padding-top:.8rem}.admin-row select{font-size:.8rem;padding:.4rem}.btn-del{border:1px solid var(--edge);background:transparent;color:var(--danger);border-radius:6px;font-size:.8rem;padding:.35rem .7rem}.btn-del:hover{background:rgba(233,77,61,.12)}.empty-state{border:1px dashed var(--edge);border-radius:12px;padding:2rem;text-align:center;color:var(--muted)}
+    .notice{border-radius:8px;padding:.75rem 1rem;font-size:.9rem;margin-top:.75rem;display:none}.notice.success{display:block;color:var(--resolved);background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.25)}.notice.error{display:block;color:#ff8d83;background:rgba(233,77,61,.08);border:1px solid rgba(233,77,61,.25)}footer{border-top:1px solid var(--edge);padding:2rem 0;color:var(--muted);font-size:.85rem}
+    @media(max-width:575px){.hero{padding:3.5rem 0 2.5rem}.pipeline-panel,.form-panel{padding:1.1rem}.pipeline-stat .num{font-size:1.5rem}.severity-group{gap:.35rem}.severity-opt{padding:.55rem .25rem}}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-sr sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="#top">Safe<span>Route</span></a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="nav"><ul class="navbar-nav ms-auto gap-lg-4"><li class="nav-item"><a class="nav-link" href="#report">Report a Hazard</a></li><li class="nav-item"><a class="nav-link" href="#dashboard">Dashboard</a></li></ul></div>
+    </div>
+  </nav>
+  <header class="hero" id="top"><div class="container"><div class="row align-items-center g-5">
+    <div class="col-lg-6"><div class="eyebrow mb-3">SDG 11 · SDG 9 · SDG 3 — PBL Phase II</div><h1 class="mb-3">See it. Report it. Get it fixed.</h1><p class="muted mb-4">Help your community identify hazards. Reports are managed through a REST API built with Node.js, Express and SQLite.</p><a href="#report" class="btn btn-hazard">Report a hazard <span aria-hidden="true">→</span></a></div>
+    <div class="col-lg-6"><div class="pipeline-panel"><div class="section-label mb-3">Resolution pipeline · Live API data</div><div class="row text-center g-0"><div class="col-4 pipeline-stat"><div class="num" id="statReported" style="color:var(--hazard)">0</div><div class="lbl">Reported</div></div><div class="col-4 pipeline-stat"><div class="num" id="statReview" style="color:var(--review)">0</div><div class="lbl">In Review</div></div><div class="col-4 pipeline-stat"><div class="num" id="statResolved" style="color:var(--resolved)">0</div><div class="lbl">Resolved</div></div></div><div class="pipeline-track" role="img" aria-label="Hazard report status distribution"><div class="seg" id="segReported" style="background:var(--hazard);width:0%"></div><div class="seg" id="segReview" style="background:var(--review);width:0%"></div><div class="seg" id="segResolved" style="background:var(--resolved);width:0%"></div></div><div id="statsHint" class="muted mt-2" style="font-size:.78rem">Loading statistics…</div></div></div>
+  </div></div></header>
+
+  <section id="report"><div class="container"><div class="row g-5"><div class="col-lg-5"><div class="section-label">Report a hazard</div><h2 class="section-title">Flag it in under a minute</h2><p class="muted">Add the location, hazard type, severity and a short description. Your report will be sent to the backend and displayed on the dashboard.</p><p class="muted small mb-0">Fields marked as required must be completed before submitting.</p></div>
+    <div class="col-lg-7"><div class="form-panel"><form id="hazardForm" class="row g-3 needs-validation" novalidate>
+      <div class="col-md-6"><label class="form-label" for="location">Location *</label><input type="text" class="form-control" id="location" name="location" placeholder="e.g. MG Road, near Bus Stand" maxlength="200" required><div class="invalid-feedback">Please enter a location.</div></div>
+      <div class="col-md-6"><label class="form-label" for="hazardType">Hazard type *</label><select class="form-select" id="hazardType" name="type" required><option value="" selected disabled>Choose a type</option><option>Pothole</option><option>Broken Streetlight</option><option>Exposed Wiring</option><option>Damaged Sidewalk</option><option>Garbage / Debris</option><option>Other</option></select><div class="invalid-feedback">Please select a hazard type.</div></div>
+      <fieldset class="col-12"><legend class="form-label">Severity *</legend><div class="severity-group"><label class="severity-opt active-low" data-level="low"><input type="radio" name="severity" value="Low" checked>Low</label><label class="severity-opt" data-level="medium"><input type="radio" name="severity" value="Medium">Medium</label><label class="severity-opt" data-level="high"><input type="radio" name="severity" value="High">High</label></div></fieldset>
+      <div class="col-12"><label class="form-label" for="description">Description *</label><textarea class="form-control" id="description" name="description" rows="3" placeholder="Briefly describe the hazard." maxlength="2000" required></textarea><div class="invalid-feedback">Please describe the hazard.</div></div>
+      <div class="col-12"><label class="form-label" for="photoInput">Photo (optional, max 2 MB)</label><input type="file" class="form-control" id="photoInput" accept="image/*"><img id="photoPreview" alt="Preview of selected hazard photo"><div id="photoHint" class="muted mt-1" style="font-size:.78rem">Choose an image only if it helps explain the hazard.</div></div>
+      <div class="col-12 pt-2"><button type="submit" class="btn btn-hazard" id="submitBtn">Submit report</button><div id="formHint" class="notice" role="status" aria-live="polite"></div></div>
+    </form></div></div>
+  </div></div></section>
+
+  <section id="dashboard"><div class="container"><div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3"><div><div class="section-label">Community dashboard</div><h2 class="section-title mb-0">Reported hazards</h2></div><span class="muted mono" id="reportCount" style="font-size:.82rem">Loading…</span></div>
+    <div class="mb-3" aria-label="Filter reports"><button type="button" class="filter-btn active" data-filter="All" aria-pressed="true">All</button><button type="button" class="filter-btn" data-filter="Reported" aria-pressed="false">Reported</button><button type="button" class="filter-btn" data-filter="In Review" aria-pressed="false">In Review</button><button type="button" class="filter-btn" data-filter="Resolved" aria-pressed="false">Resolved</button><button type="button" class="filter-btn" id="refreshBtn">↻ Refresh</button></div>
+    <div class="row g-3" id="reportGrid" aria-live="polite"><div class="col-12"><div class="empty-state">Loading reports from the server…</div></div></div>
+  </div></section>
+  <footer><div class="container d-flex flex-wrap justify-content-between gap-2"><span>SafeRoute · PBL Phase II (Backend &amp; Database)</span><span>Web Application Development (BE05000281) · Laxmi Institute of Technology, Sarigam</span></div></footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script>
+    'use strict';
+    // If the frontend is served by the same Express server, keep API_BASE as '/api'.
+    // If frontend and backend use different ports, change this to e.g. 'http://localhost:3000/api'.
+    const API_BASE = '/api';
+    const $ = (id) => document.getElementById(id);
+    const reportGrid = $('reportGrid');
+    const form = $('hazardForm');
+    let activeFilter = 'All';
+    let photoData = null;
+
+    const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const statusClass = (status) => status === 'Reported' ? 'st-reported' : status === 'In Review' ? 'st-review' : status === 'Resolved' ? 'st-resolved' : 'st-reported';
+    const severityColor = (severity) => severity === 'Low' ? 'var(--resolved)' : severity === 'Medium' ? 'var(--review)' : 'var(--danger)';
+
+    async function api(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+      if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+      headers.set('Accept', 'application/json');
+      let response;
+      try {
+        response = await fetch(`${API_BASE}${path}`, {...options, headers});
+      } catch (error) {
+        throw new Error('Cannot connect to the server. Check that your Express backend is running.');
+      }
+      const raw = await response.text();
+      let data = null;
+      if (raw) { try { data = JSON.parse(raw); } catch { data = {error: raw}; } }
+      if (!response.ok) {
+        const details = Array.isArray(data?.errors) ? data.errors.join(', ') : '';
+        throw new Error(data?.error || details || `Request failed (HTTP ${response.status})`);
+      }
+      return data;
+    }
+
+    function showNotice(message, type = 'success') {
+      const hint = $('formHint');
+      hint.textContent = message;
+      hint.className = `notice ${type}`;
+    }
+    function setLoading(isLoading) {
+      $('submitBtn').disabled = isLoading;
+      $('submitBtn').textContent = isLoading ? 'Submitting…' : 'Submit report';
+    }
+
+    async function loadStats() {
+      try {
+        const stats = await api('/stats');
+        const reported = Number(stats?.Reported || 0);
+        const review = Number(stats?.['In Review'] || 0);
+        const resolved = Number(stats?.Resolved || 0);
+        const total = reported + review + resolved;
+        $('statReported').textContent = reported;
+        $('statReview').textContent = review;
+        $('statResolved').textContent = resolved;
+        $('segReported').style.width = `${total ? reported / total * 100 : 0}%`;
+        $('segReview').style.width = `${total ? review / total * 100 : 0}%`;
+        $('segResolved').style.width = `${total ? resolved / total * 100 : 0}%`;
+        $('statsHint').textContent = `${total} total report${total === 1 ? '' : 's'}`;
+      } catch (error) {
+        $('statsHint').textContent = 'Statistics unavailable. Check the backend API.';
+      }
+    }
+
+    function renderReports(reports) {
+      if (!Array.isArray(reports)) throw new Error('Unexpected response from /api/hazards. Expected a list of reports.');
+      $('reportCount').textContent = `${reports.length} hazard${reports.length === 1 ? '' : 's'} shown`;
+      if (!reports.length) {
+        reportGrid.innerHTML = '<div class="col-12"><div class="empty-state">No hazards match this filter yet.</div></div>';
+        return;
+      }
+      reportGrid.innerHTML = reports.map((report) => {
+        const id = Number(report.id);
+        const safeId = Number.isFinite(id) ? id : 0;
+        const status = ['Reported', 'In Review', 'Resolved'].includes(report.status) ? report.status : 'Reported';
+        const severity = ['Low', 'Medium', 'High'].includes(report.severity) ? report.severity : 'Low';
+        const photo = typeof report.photo === 'string' && report.photo.startsWith('data:image/') ? `<img class="card-photo" src="${report.photo}" alt="Hazard photo" loading="lazy">` : '';
+        return `<div class="col-md-6 col-lg-4"><article class="report-card">
+          ${photo}
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-3"><span class="status-badge ${statusClass(status)}">${escapeHTML(status)}</span><span class="muted mono" style="font-size:.73rem;white-space:nowrap"><span aria-hidden="true" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:${severityColor(severity)}"></span>${escapeHTML(severity)}</span></div>
+          <h3 class="h5 mb-1">${escapeHTML(report.location)}</h3><div class="muted mb-2" style="font-size:.82rem">${escapeHTML(report.type)}</div><p class="muted mb-0" style="font-size:.9rem;white-space:pre-wrap">${escapeHTML(report.description)}</p>
+          <div class="admin-row"><label class="visually-hidden" for="status-${safeId}">Update report status</label><select class="form-select" id="status-${safeId}" data-action="status" data-id="${safeId}">${['Reported','In Review','Resolved'].map((option) => `<option value="${option}" ${option === status ? 'selected' : ''}>${option}</option>`).join('')}</select><button type="button" class="btn-del" data-action="delete" data-id="${safeId}" aria-label="Delete report ${safeId}">Delete</button></div>
+        </article></div>`;
+      }).join('');
+    }
+
+    async function loadReports() {
+      reportGrid.innerHTML = '<div class="col-12"><div class="empty-state">Loading reports…</div></div>';
+      try {
+        const query = activeFilter === 'All' ? '' : `?status=${encodeURIComponent(activeFilter)}`;
+        const reports = await api(`/hazards${query}`);
+        renderReports(reports);
+      } catch (error) {
+        reportGrid.innerHTML = `<div class="col-12"><div class="empty-state">${escapeHTML(error.message)}<div class="mt-2"><button type="button" class="btn btn-hazard" id="retryBtn">Try again</button></div></div></div>`;
+        const retryBtn = $('retryBtn');
+        if (retryBtn) retryBtn.addEventListener('click', refreshDashboard);
+      }
+      await loadStats();
+    }
+    async function refreshDashboard() { await loadReports(); }
+
+    async function changeStatus(id, status, selectElement) {
+      selectElement.disabled = true;
+      try {
+        await api(`/hazards/${encodeURIComponent(id)}/status`, {method:'PATCH', body:JSON.stringify({status})});
+        await refreshDashboard();
+      } catch (error) {
+        window.alert(`Could not update status: ${error.message}`);
+        await refreshDashboard();
+      } finally { selectElement.disabled = false; }
+    }
+    async function deleteReport(id, button) {
+      if (!window.confirm('Are you sure you want to delete this report? This action cannot be undone.')) return;
+      button.disabled = true;
+      try {
+        await api(`/hazards/${encodeURIComponent(id)}`, {method:'DELETE'});
+        await refreshDashboard();
+      } catch (error) {
+        window.alert(`Could not delete report: ${error.message}`);
+        button.disabled = false;
+      }
+    }
+
+    document.querySelectorAll('.filter-btn[data-filter]').forEach((button) => button.addEventListener('click', async () => {
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll('.filter-btn[data-filter]').forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle('active', selected);
+        item.setAttribute('aria-pressed', String(selected));
+      });
+      await loadReports();
+    }));
+    $('refreshBtn').addEventListener('click', refreshDashboard);
+
+    reportGrid.addEventListener('change', (event) => {
+      const select = event.target.closest('select[data-action="status"]');
+      if (select) changeStatus(select.dataset.id, select.value, select);
+    });
+    reportGrid.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action="delete"]');
+      if (button) deleteReport(button.dataset.id, button);
+    });
+
+    document.querySelectorAll('.severity-opt').forEach((option) => option.addEventListener('click', () => {
+      document.querySelectorAll('.severity-opt').forEach((item) => item.classList.remove('active-low','active-medium','active-high'));
+      option.classList.add(`active-${option.dataset.level}`);
+      const radio = option.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    }));
+
+    $('photoInput').addEventListener('change', () => {
+      const file = $('photoInput').files?.[0];
+      photoData = null;
+      $('photoPreview').removeAttribute('src');
+      $('photoPreview').style.display = 'none';
+      $('photoHint').textContent = 'Choose an image only if it helps explain the hazard.';
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { $('photoInput').value = ''; $('photoHint').textContent = 'Please select a valid image file.'; return; }
+      if (file.size > 2 * 1024 * 1024) { $('photoInput').value = ''; $('photoHint').textContent = 'Image is too large. Please choose a file smaller than 2 MB.'; return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result !== 'string') { $('photoHint').textContent = 'Could not read this image. Please try another file.'; return; }
+        photoData = reader.result;
+        $('photoPreview').src = photoData;
+        $('photoPreview').style.display = 'block';
+        $('photoHint').textContent = `${file.name} selected`;
+      };
+      reader.onerror = () => { photoData = null; $('photoHint').textContent = 'Could not read this image. Please try another file.'; };
+      reader.readAsDataURL(file);
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) { form.classList.add('was-validated'); form.reportValidity(); return; }
+      const selectedSeverity = form.querySelector('input[name="severity"]:checked');
+      const payload = {
+        location: $('location').value.trim(),
+        type: $('hazardType').value,
+        severity: selectedSeverity ? selectedSeverity.value : 'Low',
+        description: $('description').value.trim(),
+        photo: photoData
+      };
+      if (!payload.location || !payload.description) { showNotice('Please complete all required fields.', 'error'); return; }
+      setLoading(true);
+      $('formHint').className = 'notice';
+      try {
+        await api('/hazards', {method:'POST', body:JSON.stringify(payload)});
+        form.reset();
+        form.classList.remove('was-validated');
+        photoData = null;
+        $('photoPreview').removeAttribute('src');
+        $('photoPreview').style.display = 'none';
+        $('photoHint').textContent = 'Choose an image only if it helps explain the hazard.';
+        document.querySelectorAll('.severity-opt').forEach((item) => item.classList.remove('active-low','active-medium','active-high'));
+        document.querySelector('.severity-opt[data-level="low"]').classList.add('active-low');
+        activeFilter = 'All';
+        document.querySelectorAll('.filter-btn[data-filter]').forEach((item) => {
+          const selected = item.dataset.filter === 'All';
+          item.classList.toggle('active', selected);
+          item.setAttribute('aria-pressed', String(selected));
+        });
+        showNotice('Report saved successfully to the database.', 'success');
+        await loadReports();
+        $('dashboard').scrollIntoView({behavior:'smooth', block:'start'});
+      } catch (error) {
+        showNotice(`Could not submit report: ${error.message}`, 'error');
+      } finally { setLoading(false); }
+    });
+
+    // Initial page load
+    refreshDashboard();
+  </script>
+</body>
+</html>
